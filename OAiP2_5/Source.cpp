@@ -16,24 +16,26 @@ struct Arr
 	string FIO;
 };
 
-int correctInputInt();
-void addData(Tree*& root);
 Tree* createLeaf(int number, string FIO);
 string checkInputString();
-bool isAddLeaf(Tree*& root, int number, string FIO);
-void deleteLeafSimple(Tree*& root, Tree*& del_element, Tree*& prev_del);
+int correctInputInt();
+void addData(Tree*& root);
 void deleteLeaf(Tree*& root);
+void deleteLeafSimple(Tree*& root, Tree*& del_element, Tree*& prev_del);
 void deleteLeafOneConnection(Tree*& root, Tree*& del_element, Tree*& prev_del);
 void deleteLeafTwoConnections(Tree*& root, Tree*& del_element, Tree*& prev_del);
 void balanceTree(Tree*& root);
 void countElements(Tree* temp, int& number_of_elements);
 void addElementsToArray(Tree* temp, Arr* arr, int& count);
-void sortElements(Arr* arr, int number_of_elements);
 void makeBalance(Tree*& root, Arr* arr, int n, int number_of_elements);
 void findLeaf(Tree* root);
-void countSymbols(Tree*& temp, int& count);
+void countSymbols(Tree* temp, int& count);
 void deleteTree(Tree*& temp);
 void viewTree(Tree* temp, int level);
+void printInfoVar1(Tree* temp);
+void printInfoVar2(Tree* temp);
+void printInfoVar3(Tree* temp);
+bool isAddLeaf(Tree*& root, int number, string FIO);
 bool isTreeExist(Tree* root);
 
 int main()
@@ -46,9 +48,10 @@ int main()
 		{
 			do
 			{
-				cout << "\n Enter input data - 1\n Balance Tree - 2\n Search leaf - 3\n Delete leaf - 4\n View tree - 5\n Individual task - 6\n Delete tree - 7\n EXIT - 0\n";
+				cout << "\n Enter input data -> 1\n Balance Tree -> 2\n Search leaf -> 3\n Delete leaf -> 4\n View tree -> 5\n Individual task -> 6\n"
+					<< " Delete tree -> 7\n Print info variant 1 -> 8\n Print info variant 2 -> 9\n Print info variant 3 -> 10\n EXIT -> 0\n";
 				code = correctInputInt();
-			} while (code < 0 || code > 7);
+			} while (code < 0 || code > 10);
 		}
 		else
 		{
@@ -84,6 +87,18 @@ int main()
 			deleteTree(root);
 			cout << "Tree deleted successfully!" << endl;
 			break;
+		case 8:
+			printInfoVar1(root);
+			cout << endl;
+			break;
+		case 9:
+			printInfoVar2(root);
+			cout << endl;
+			break;
+		case 10:
+			printInfoVar3(root);
+			cout << endl;
+			break;
 		case 0:
 			cout << "Safe exit..." << endl;
 			if (root)
@@ -94,6 +109,36 @@ int main()
 			system("pause");
 			return 0;
 		}
+	}
+}
+
+void printInfoVar1(Tree* temp)//прямой левый обход
+{
+	if (temp)
+	{
+		cout << temp->number << '\t';
+		printInfoVar1(temp->left);
+		printInfoVar1(temp->right);
+	}
+}
+
+void printInfoVar2(Tree* temp)//обратный левый обход
+{
+	if (temp)
+	{
+		printInfoVar2(temp->left);
+		printInfoVar2(temp->right);
+		cout << temp->number << '\t';
+	}
+}
+
+void printInfoVar3(Tree* temp)//по возрастанию
+{
+	if (temp)
+	{
+		printInfoVar3(temp->left);
+		cout << temp->number << '\t';
+		printInfoVar3(temp->right);
 	}
 }
 
@@ -135,7 +180,7 @@ void deleteTree(Tree*& temp)
 	temp = NULL;
 }
 
-void countSymbols(Tree*& temp, int& count)
+void countSymbols(Tree* temp, int& count)
 {
 	if (temp)
 	{
@@ -178,7 +223,6 @@ void balanceTree(Tree*& root)
 	countElements(root, number_of_elements);
 	Arr* arr = new Arr[number_of_elements];
 	addElementsToArray(root, arr, elements);
-	sortElements(arr, number_of_elements);
 	makeBalance(root, arr, 0, number_of_elements);
 	delete[]arr;
 	cout << "Tree balanced successfully!" << endl;
@@ -201,36 +245,15 @@ void makeBalance(Tree*& root, Arr* arr, int n, int number_of_elements)
 	}
 }
 
-void sortElements(Arr* arr, int number_of_elements)
-{
-	int temp_number;
-	string temp_string;
-	for (int i = 0; i < number_of_elements - 1; i++)
-	{
-		for (int j = 0; j < number_of_elements - 1; j++)
-		{
-			if (arr[j + 1].number < arr[j].number)
-			{
-				temp_number = arr[j + 1].number;
-				temp_string = arr[j + 1].FIO;
-				arr[j + 1].number = arr[j].number;
-				arr[j + 1].FIO = arr[j].FIO;
-				arr[j].number = temp_number;
-				arr[j].FIO = temp_string;
-			}
-		}
-	}
-}
-
 void addElementsToArray(Tree* temp, Arr* arr, int& count)
 {
 	if (temp)
 	{
-		addElementsToArray(temp->right, arr, count);
+		addElementsToArray(temp->left, arr, count);
 		arr[count].number = temp->number;
 		arr[count].FIO = temp->FIO;
 		count++;
-		addElementsToArray(temp->left, arr, count);
+		addElementsToArray(temp->right, arr, count);
 	}
 }
 
@@ -426,14 +449,12 @@ Tree* createLeaf(int number, string FIO)
 	temp->number = number;
 	temp->FIO = FIO;
 	temp->left = temp->right = NULL;
-	//root = temp;
 	return temp;
 }
 
 bool isAddLeaf(Tree*& root, int number, string FIO)
 {
 	Tree* prev = NULL, * temp = NULL;
-	//bool is_duplicate_finded = false;
 	temp = root;
 	while (temp)
 	{
@@ -453,26 +474,44 @@ bool isAddLeaf(Tree*& root, int number, string FIO)
 		}
 	}
 	temp = createLeaf(number, FIO);
-	if (number < prev->number)
+	if (prev)
 	{
-		prev->left = temp;
+		if (number < prev->number)
+		{
+			prev->left = temp;
+		}
+		else
+		{
+			prev->right = temp;
+		}
+		return true;
 	}
 	else
 	{
-		prev->right = temp;
+		return false;
 	}
-	return true;
 }
 
 string checkInputString()
 {
 	char symbol;
 	string buffer;
+	bool flag = true;
 	while (true)
 	{
 		symbol = _getch();
 		if (symbol == '\r')
 		{
+			if (buffer.size() == 0)
+			{
+				cout << "String is empty! Try again!" << endl;
+				continue;
+			}
+			if (buffer.at(buffer.size() - 1) == ' ')
+			{
+				cout << "\b \b";
+				buffer.erase(buffer.length() - 1);
+			}
 			break;
 		}
 		if (symbol == '\b')//backspace
@@ -487,6 +526,18 @@ string checkInputString()
 		if (!((symbol >= 'a' && symbol <= 'z') || (symbol >= 'A' && symbol <= 'Z') || symbol == ' '))
 		{
 			continue;
+		}
+		else if ((symbol >= 'a' && symbol <= 'z') || (symbol >= 'A' && symbol <= 'Z'))
+		{
+			flag = false;
+		}
+		else if (symbol == ' ' && flag)
+		{
+			continue;
+		}
+		else
+		{
+			flag = true;
 		}
 		buffer += symbol;
 		cout << symbol;
