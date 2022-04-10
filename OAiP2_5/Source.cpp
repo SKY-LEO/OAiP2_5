@@ -7,7 +7,7 @@ struct Tree
 {
 	int number = 0;
 	string FIO;
-	Tree* left = NULL, * right = NULL;
+	Tree* left = nullptr, * right = nullptr;
 };
 
 struct Arr
@@ -32,15 +32,15 @@ void findLeaf(Tree* root);
 void countSymbols(Tree* temp, int& count);
 void deleteTree(Tree*& temp);
 void viewTree(Tree* temp, int level);
-void printInfoVar1(Tree* temp);
-void printInfoVar2(Tree* temp);
-void printInfoVar3(Tree* temp);
+void printInfoDirectBypass(Tree* temp);
+void printInfoReverseBypass(Tree* temp);
+void printInfoAscendingBypass(Tree* temp);
 bool isAddLeaf(Tree*& root, int number, string FIO);
 bool isTreeExist(Tree* root);
 
 int main()
 {
-	Tree* root = NULL;
+	Tree* root = nullptr;
 	int code, count;
 	while (true)
 	{
@@ -49,7 +49,7 @@ int main()
 			do
 			{
 				cout << "\n Enter input data -> 1\n Balance Tree -> 2\n Search leaf -> 3\n Delete leaf -> 4\n View tree -> 5\n Individual task -> 6\n"
-					<< " Delete tree -> 7\n Print info variant 1 -> 8\n Print info variant 2 -> 9\n Print info variant 3 -> 10\n EXIT -> 0\n";
+					<< " Delete tree -> 7\n Print info(direct bypass) -> 8\n Print info(reverse bypass) -> 9\n Print info(ascending bypass) -> 10\n EXIT -> 0\n";
 				code = correctInputInt();
 			} while (code < 0 || code > 10);
 		}
@@ -88,15 +88,15 @@ int main()
 			cout << "Tree deleted successfully!" << endl;
 			break;
 		case 8:
-			printInfoVar1(root);
+			printInfoDirectBypass(root);
 			cout << endl;
 			break;
 		case 9:
-			printInfoVar2(root);
+			printInfoReverseBypass(root);
 			cout << endl;
 			break;
 		case 10:
-			printInfoVar3(root);
+			printInfoAscendingBypass(root);
 			cout << endl;
 			break;
 		case 0:
@@ -109,36 +109,6 @@ int main()
 			system("pause");
 			return 0;
 		}
-	}
-}
-
-void printInfoVar1(Tree* temp)//прямой левый обход
-{
-	if (temp)
-	{
-		cout << temp->number << '\t';
-		printInfoVar1(temp->left);
-		printInfoVar1(temp->right);
-	}
-}
-
-void printInfoVar2(Tree* temp)//обратный левый обход
-{
-	if (temp)
-	{
-		printInfoVar2(temp->left);
-		printInfoVar2(temp->right);
-		cout << temp->number << '\t';
-	}
-}
-
-void printInfoVar3(Tree* temp)//по возрастанию
-{
-	if (temp)
-	{
-		printInfoVar3(temp->left);
-		cout << temp->number << '\t';
-		printInfoVar3(temp->right);
 	}
 }
 
@@ -177,17 +147,7 @@ void deleteTree(Tree*& temp)
 		deleteTree(temp->left);
 		delete temp;
 	}
-	temp = NULL;
-}
-
-void countSymbols(Tree* temp, int& count)
-{
-	if (temp)
-	{
-		countSymbols(temp->right, count);
-		count += temp->FIO.size();
-		countSymbols(temp->left, count);
-	}
+	temp = nullptr;
 }
 
 void findLeaf(Tree* root)
@@ -208,7 +168,7 @@ void findLeaf(Tree* root)
 			element = element->left;
 		}
 	}
-	if (element == NULL)
+	if (element == nullptr)
 	{
 		cout << "There's no such number!" << endl;
 		return;
@@ -228,6 +188,28 @@ void balanceTree(Tree*& root)
 	cout << "Tree balanced successfully!" << endl;
 }
 
+void countElements(Tree* temp, int& number_of_elements)
+{
+	if (temp)
+	{
+		countElements(temp->right, number_of_elements);
+		number_of_elements++;
+		countElements(temp->left, number_of_elements);
+	}
+}
+
+void addElementsToArray(Tree* temp, Arr* arr, int& count)
+{
+	if (temp)
+	{
+		addElementsToArray(temp->left, arr, count);
+		arr[count].number = temp->number;
+		arr[count].FIO = temp->FIO;
+		count++;
+		addElementsToArray(temp->right, arr, count);
+	}
+}
+
 void makeBalance(Tree*& root, Arr* arr, int n, int number_of_elements)
 {
 	if (n == number_of_elements)
@@ -245,25 +227,13 @@ void makeBalance(Tree*& root, Arr* arr, int n, int number_of_elements)
 	}
 }
 
-void addElementsToArray(Tree* temp, Arr* arr, int& count)
+void countSymbols(Tree* temp, int& count)
 {
 	if (temp)
 	{
-		addElementsToArray(temp->left, arr, count);
-		arr[count].number = temp->number;
-		arr[count].FIO = temp->FIO;
-		count++;
-		addElementsToArray(temp->right, arr, count);
-	}
-}
-
-void countElements(Tree* temp, int& number_of_elements)
-{
-	if (temp)
-	{
-		countElements(temp->right, number_of_elements);
-		number_of_elements++;
-		countElements(temp->left, number_of_elements);
+		countSymbols(temp->right, count);
+		count += temp->FIO.size();
+		countSymbols(temp->left, count);
 	}
 }
 
@@ -274,7 +244,7 @@ void deleteLeaf(Tree*& root)
 	cout << "Enter number:" << endl;
 	number = correctInputInt();
 	del_element = root;
-	prev_del = NULL;
+	prev_del = nullptr;
 	while (del_element && del_element->number != number)
 	{
 		prev_del = del_element;
@@ -287,20 +257,20 @@ void deleteLeaf(Tree*& root)
 			del_element = del_element->left;
 		}
 	}
-	if (del_element == NULL)
+	if (del_element == nullptr)
 	{
 		cout << "There's no such number!" << endl;
 		return;
 	}
-	if (del_element->left == NULL && del_element->right == NULL)
+	if (del_element->left == nullptr && del_element->right == nullptr)
 	{
 		deleteLeafSimple(root, del_element, prev_del);
 	}
-	else if ((del_element->left != NULL && del_element->right == NULL) || (del_element->right != NULL && del_element->left == NULL))
+	else if ((del_element->left != nullptr && del_element->right == nullptr) || (del_element->right != nullptr && del_element->left == nullptr))
 	{
 		deleteLeafOneConnection(root, del_element, prev_del);
 	}
-	else if (del_element->left != NULL && del_element->right != NULL)
+	else if (del_element->left != nullptr && del_element->right != nullptr)
 	{
 		deleteLeafTwoConnections(root, del_element, prev_del);
 	}
@@ -312,19 +282,19 @@ void deleteLeafSimple(Tree*& root, Tree*& del_element, Tree*& prev_del)
 	{
 		if (del_element->number > prev_del->number)
 		{
-			prev_del->right = NULL;
+			prev_del->right = nullptr;
 		}
 		else
 		{
-			prev_del->left = NULL;
+			prev_del->left = nullptr;
 		}
 	}
 	else
 	{
-		root = NULL;
+		root = nullptr;
 	}
 	delete del_element;
-	cout << "Leaf succesfully deleted!" << endl;
+	cout << "Leaf successfully deleted!" << endl;
 }
 
 void deleteLeafOneConnection(Tree*& root, Tree*& del_element, Tree*& prev_del)
@@ -366,15 +336,15 @@ void deleteLeafOneConnection(Tree*& root, Tree*& del_element, Tree*& prev_del)
 		}
 	}
 	delete del_element;
-	cout << "Leaf succesfully deleted!" << endl;
+	cout << "Leaf successfully deleted!" << endl;
 }
 
 void deleteLeafTwoConnections(Tree*& root, Tree*& del_element, Tree*& prev_del)//самый левый в правом
 {
-	Tree* replacement = NULL, * prev_replacement = NULL;
+	Tree* replacement = nullptr, * prev_replacement = nullptr;
 	prev_replacement = del_element;
 	replacement = del_element->right;
-	while (replacement->left != NULL)
+	while (replacement->left != nullptr)
 	{
 		prev_replacement = replacement;
 		replacement = replacement->left;
@@ -419,7 +389,7 @@ void addData(Tree*& root)
 		cout << "How many records do you want to add?" << endl;
 		n = correctInputInt();
 	} while (n < 1);
-	if (root == NULL)
+	if (root == nullptr)
 	{
 		cout << "\n-> " << i + 1 << endl;
 		cout << "Enter number:" << endl;
@@ -439,7 +409,7 @@ void addData(Tree*& root)
 		if (!isAddLeaf(root, number, FIO))
 		{
 			i--;
-		};
+		}
 	}
 }
 
@@ -448,13 +418,13 @@ Tree* createLeaf(int number, string FIO)
 	Tree* temp = new Tree;
 	temp->number = number;
 	temp->FIO = FIO;
-	temp->left = temp->right = NULL;
+	temp->left = temp->right = nullptr;
 	return temp;
 }
 
 bool isAddLeaf(Tree*& root, int number, string FIO)
 {
-	Tree* prev = NULL, * temp = NULL;
+	Tree* prev = nullptr, * temp = nullptr;
 	temp = root;
 	while (temp)
 	{
@@ -492,17 +462,46 @@ bool isAddLeaf(Tree*& root, int number, string FIO)
 	}
 }
 
+void printInfoDirectBypass(Tree* temp)//прямой левый обход
+{
+	if (temp)
+	{
+		cout << temp->number << '\t';
+		printInfoDirectBypass(temp->left);
+		printInfoDirectBypass(temp->right);
+	}
+}
+
+void printInfoReverseBypass(Tree* temp)//обратный левый обход
+{
+	if (temp)
+	{
+		printInfoReverseBypass(temp->left);
+		printInfoReverseBypass(temp->right);
+		cout << temp->number << '\t';
+	}
+}
+
+void printInfoAscendingBypass(Tree* temp)//по возрастанию
+{
+	if (temp)
+	{
+		printInfoAscendingBypass(temp->left);
+		cout << temp->number << '\t';
+		printInfoAscendingBypass(temp->right);
+	}
+}
+
 string checkInputString()
 {
 	char symbol;
 	string buffer;
-	bool flag = true;
 	while (true)
 	{
-		symbol = _getch();
+		symbol = (char)_getch();
 		if (symbol == '\r')
 		{
-			if (buffer.size() == 0)
+			if (buffer.empty())
 			{
 				cout << "String is empty! Try again!" << endl;
 				continue;
@@ -510,16 +509,16 @@ string checkInputString()
 			if (buffer.at(buffer.size() - 1) == ' ')
 			{
 				cout << "\b \b";
-				buffer.erase(buffer.length() - 1);
+				buffer.erase(buffer.size() - 1);
 			}
 			break;
 		}
 		if (symbol == '\b')//backspace
 		{
-			if (buffer.size() != 0)
+			if (!buffer.empty())
 			{
 				cout << "\b \b";
-				buffer.erase(buffer.length() - 1);
+				buffer.erase(buffer.size() - 1);
 			}
 			continue;
 		}
@@ -527,17 +526,9 @@ string checkInputString()
 		{
 			continue;
 		}
-		else if ((symbol >= 'a' && symbol <= 'z') || (symbol >= 'A' && symbol <= 'Z'))
-		{
-			flag = false;
-		}
-		else if (symbol == ' ' && flag)
+		else if ((!buffer.empty() && symbol == ' ' && buffer.at(buffer.size() - 1) == ' ') || (buffer.empty() && symbol == ' '))
 		{
 			continue;
-		}
-		else
-		{
-			flag = true;
 		}
 		buffer += symbol;
 		cout << symbol;
