@@ -50,6 +50,7 @@ int heightTree(Tree* temp);
 int maxNumber(int res, int rate);
 int pow_2(int res, int i);
 int correctInputInt();
+int countR(double num, int i);
 
 int main()
 {
@@ -148,36 +149,105 @@ int pow_2(int res, int i)
 	return pow_2(res, i - 1);
 }
 
+int countR(double num, int i)
+{
+	if (num > -1 && num < 1)
+	{
+		return i;
+	}
+	return countR(num / 10, i + 1);
+}
+
 void viewTree2(Tree* root)
 {
 	int i = 0;
 	int j = 0;
-	int k = 0;
+	int res;
 	int num_of_elements_in_string = 2;
 	int height = heightTree(root);
 	int number_of_elements_max = maxNumber(1, height);
-	int max_length = height * 20;//50
-	int length = max_length / 3;
-	int g = max_length;
+	int max_length = height * 32;//50
+	int length = max_length / 2;
+	int g;
+	int var = 0;
+	bool flag = false, flag1=false;
 	Queue* begin = nullptr, * end = nullptr;
+	Tree* curr = nullptr;
 	pushQueue(begin, end, root);
 	while (j < number_of_elements_max)
 	{
-		if(k!=2)for (int i = 0; i < length; i++)cout << " ";
-		else {
-			k = 0;
-			for (int i = 0; i < g; i++)cout << " ";
-		}
-		Tree* curr = popQueue(begin, end);
+		
+		curr = popQueue(begin, end);
 		if (curr)
 		{
+			res = countR(curr->number, 0);
+			if (curr->number < 0) res++;
+			if (flag)
+			{
+				if (!flag1)
+				{
+					g = length * 2 - res / 2;
+				}
+				else
+				{
+					g = length * 2-var-res/2;
+					flag1 = false;
+				}
+				
+				for (int i = 0; i < g; i++)cout << " ";
+				var = (int)(res / 2. +0.4);
+				flag1 = true;
+			}
+			else
+			{
+				flag = true;
+				if (!flag1)
+				{
+					g = length - res / 2;
+				}
+				else
+				{
+					g = length - var - res/2;
+					flag1 = false;
+				}
+				for (int i = 0; i < g; i++)cout << " ";
+				var = (int)(res / 2. + 0.4);
+				flag1 = true;
+			}
 			cout << curr->number;
 			pushQueue(begin, end, curr->left);
 			pushQueue(begin, end, curr->right);
 		}
 		else
 		{
-			cout << " - ";
+			if (flag)
+			{
+				if (!flag1)
+				{
+					g = length *2- 1;
+				}
+				else
+				{
+					g = length*2 - var-1;
+					flag1 = false;
+				}
+				for (int i = 0; i < g; i++)cout << " ";
+			}
+			else
+			{
+				flag = true;
+				if (!flag1)
+				{
+					g = length-1;
+				}
+				else
+				{
+					g = length - var-1;
+					flag1 = false;
+				}
+				for (int i = 0; i < g; i++)cout << " ";
+			}
+			cout << "-";
 			pushQueue(begin, end, nullptr);
 			pushQueue(begin, end, nullptr);
 		}
@@ -186,17 +256,11 @@ void viewTree2(Tree* root)
 		if (i % num_of_elements_in_string == 0)
 		{
 			cout << endl;
-			//length = (max_length + num_of_elements_in_string);
 			num_of_elements_in_string *= 2;
-			//length = max_length / (num_of_elements_in_string + 1);
-			length = max_length / (num_of_elements_in_string + 1);
-			g = max_length / (num_of_elements_in_string + 1) * num_of_elements_in_string;
-			//length *= 
+			length = max_length / num_of_elements_in_string;
 			i = 0;
+			flag = false;
 		}
-		k++;
-
-			
 	}
 	deleteQueue(begin, end);
 }
