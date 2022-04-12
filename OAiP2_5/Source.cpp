@@ -16,9 +16,15 @@ struct Arr
 	string FIO;
 };
 
+struct Queue
+{
+	Tree* number;
+	Queue* prev, * next;
+};
+
 Tree* createLeaf(int number, string FIO);
+Tree* popQueue(Queue*& begin, Queue*& end);
 string checkInputString();
-int correctInputInt();
 void addData(Tree*& root);
 void deleteLeaf(Tree*& root);
 void deleteLeafSimple(Tree*& root, Tree*& del_element, Tree*& prev_del);
@@ -35,13 +41,21 @@ void viewTree(Tree* temp, int level);
 void printInfoDirectBypass(Tree* temp);
 void printInfoReverseBypass(Tree* temp);
 void printInfoAscendingBypass(Tree* temp);
+void viewTree2(Tree* root);
+void pushQueue(Queue*& begin, Queue*& end, Tree* number);
+void deleteQueue(Queue*& begin, Queue*& end);
 bool isAddLeaf(Tree*& root, int number, string FIO);
 bool isTreeExist(Tree* root);
+int heightTree(Tree* temp);
+int maxNumber(int res, int rate);
+int pow_2(int res, int i);
+int correctInputInt();
 
 int main()
 {
 	Tree* root = nullptr;
 	int code, count;
+	int number_max, h, st, var;
 	while (true)
 	{
 		if (isTreeExist(root))
@@ -77,6 +91,8 @@ int main()
 			break;
 		case 5:
 			viewTree(root, 0);
+			cout << endl;
+			viewTree2(root);
 			break;
 		case 6:
 			count = 0;
@@ -111,6 +127,149 @@ int main()
 		}
 	}
 }
+
+int maxNumber(int res, int rate)
+{
+	if (rate == 0)
+	{
+		return res;
+	}
+	res += pow_2(1, rate);
+	return maxNumber(res, rate - 1);
+}
+
+int pow_2(int res, int i)
+{
+	if (i == 0)
+	{
+		return res;
+	}
+	res *= 2;
+	return pow_2(res, i - 1);
+}
+
+void viewTree2(Tree* root)
+{
+	int i = 0;
+	int j = 0;
+	int k = 0;
+	int num_of_elements_in_string = 2;
+	int height = heightTree(root);
+	int number_of_elements_max = maxNumber(1, height);
+	int max_length = height * 20;//50
+	int length = max_length / 3;
+	int g = max_length;
+	Queue* begin = nullptr, * end = nullptr;
+	pushQueue(begin, end, root);
+	while (j < number_of_elements_max)
+	{
+		if(k!=2)for (int i = 0; i < length; i++)cout << " ";
+		else {
+			k = 0;
+			for (int i = 0; i < g; i++)cout << " ";
+		}
+		Tree* curr = popQueue(begin, end);
+		if (curr)
+		{
+			cout << curr->number;
+			pushQueue(begin, end, curr->left);
+			pushQueue(begin, end, curr->right);
+		}
+		else
+		{
+			cout << " - ";
+			pushQueue(begin, end, nullptr);
+			pushQueue(begin, end, nullptr);
+		}
+		j++;
+		i += 2;
+		if (i % num_of_elements_in_string == 0)
+		{
+			cout << endl;
+			//length = (max_length + num_of_elements_in_string);
+			num_of_elements_in_string *= 2;
+			//length = max_length / (num_of_elements_in_string + 1);
+			length = max_length / (num_of_elements_in_string + 1);
+			g = max_length / (num_of_elements_in_string + 1) * num_of_elements_in_string;
+			//length *= 
+			i = 0;
+		}
+		k++;
+
+			
+	}
+	deleteQueue(begin, end);
+}
+
+void pushQueue(Queue*& begin, Queue*& end, Tree* number)
+{
+	Queue* temp = new Queue;
+	temp->number = number;
+	if (begin == nullptr)
+	{
+		temp->next = temp->prev = nullptr;
+		begin = temp;
+		end = temp;
+	}
+	else
+	{
+		temp->next = nullptr;//сзади нет
+		temp->prev = end;//впереди есть
+		end->next = temp;
+		end = temp;
+	}
+}
+
+Tree* popQueue(Queue*& begin, Queue*& end)//по адресу
+{
+	Queue* temp = begin;
+	Tree* out;
+	out = begin->number;
+	if (begin != end)
+	{
+		begin = begin->next;
+		begin->prev = nullptr;
+	}
+	else
+	{
+		begin = end = nullptr;
+	}
+	delete temp;
+	return out;
+}
+
+void deleteQueue(Queue*& begin, Queue*& end)
+{
+	while (begin)
+	{
+		Queue* temp = begin;
+		begin = begin->next;
+		delete temp;
+	}
+	end = nullptr;
+	cout << "\nQueue deleted successfully" << endl;
+}
+
+int heightTree(Tree* temp)
+{
+	if (temp == nullptr)
+	{
+		return 0;
+	}
+	else if (temp->left == nullptr && temp->right == nullptr)
+	{
+		return 0;
+	}
+	else if (heightTree(temp->left) > heightTree(temp->right))
+	{
+		return heightTree(temp->left) + 1;
+	}
+	else
+	{
+		return heightTree(temp->right) + 1;
+	}
+}
+
 
 bool isTreeExist(Tree* root)
 {
