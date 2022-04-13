@@ -57,7 +57,6 @@ int main()
 {
 	Tree* root = nullptr;
 	int code, count;
-	int number_max, h, st, var;
 	while (true)
 	{
 		if (isTreeExist(root))
@@ -73,7 +72,7 @@ int main()
 		{
 			do
 			{
-				cout << "\n Enter input data - 1\n EXIT - 0\n";
+				cout << "\n Enter input data -> 1\n EXIT -> 0\n";
 				code = correctInputInt();
 			} while (code < 0 || code > 1);
 		}
@@ -93,7 +92,7 @@ int main()
 			break;
 		case 5:
 			viewTree(root, 0);
-			cout << endl;
+			cout << "-------------------------------------------" << endl;
 			viewTree2(root);
 			break;
 		case 6:
@@ -130,6 +129,107 @@ int main()
 	}
 }
 
+bool isTreeExist(Tree* root)
+{
+	if (root)
+	{
+		return true;
+	}
+	else
+	{
+		cout << "Tree doesn't exist!" << endl;
+		return false;
+	}
+}
+
+void viewTree2(Tree* root)
+{
+	int count_of_pushed_elements = 0, count_of_printed_elements = 0, count_of_levels = 0, num_of_elements_in_string = 2;
+	int num_of_digits, count_of_spaces, offset_of_element;
+	bool is_not_start_of_string = false, is_not_start = false;
+	int height = heightTree(root);
+	int number_of_elements_max = maxNumber(1, height);
+	int max_length = findMaxLength(height, 1);
+	int length = max_length / 2;
+	Queue* begin = nullptr, * end = nullptr;
+	Tree* current_leaf = nullptr;
+	pushQueue(begin, end, root);
+	while (count_of_printed_elements < number_of_elements_max)
+	{
+		current_leaf = popQueue(begin, end);
+		if (current_leaf)
+		{
+			num_of_digits = countDigits(current_leaf->number, 0);
+			if (current_leaf->number < 0) num_of_digits++;
+			count_of_spaces = length * 2 - round(num_of_digits / 2.);
+			if (is_not_start_of_string)
+			{
+				if (is_not_start)
+				{
+					count_of_spaces -= offset_of_element;
+					is_not_start = false;
+				}
+			}
+			else
+			{
+				cout << count_of_levels++ << "|";
+				is_not_start_of_string = true;
+				count_of_spaces -= length;
+				if (is_not_start)
+				{
+					count_of_spaces -= offset_of_element;
+					is_not_start = false;
+				}
+			}
+			for (int i = 0; i < count_of_spaces; i++)cout << " ";
+			offset_of_element = round(num_of_digits / 2. - 0.1);
+			is_not_start = true;
+			cout << current_leaf->number;
+			pushQueue(begin, end, current_leaf->left);
+			pushQueue(begin, end, current_leaf->right);
+		}
+		else
+		{
+			count_of_spaces = length * 2 - 1;
+			if (is_not_start_of_string)
+			{
+				if (is_not_start)
+				{
+					count_of_spaces -= offset_of_element;
+					is_not_start = false;
+				}
+			}
+			else
+			{
+				cout << count_of_levels++ << "|";
+				is_not_start_of_string = true;
+				count_of_spaces -= length;
+				if (is_not_start)
+				{
+					count_of_spaces -= offset_of_element;
+					is_not_start = false;
+				}
+			}
+			for (int i = 0; i < count_of_spaces; i++)cout << " ";
+			cout << "-";
+			pushQueue(begin, end, nullptr);
+			pushQueue(begin, end, nullptr);
+		}
+		count_of_printed_elements++;
+		count_of_pushed_elements += 2;
+		if (count_of_pushed_elements % num_of_elements_in_string == 0)
+		{
+			cout << endl;
+			num_of_elements_in_string *= 2;
+			length /= 2;
+			count_of_pushed_elements = 0;
+			is_not_start_of_string = false;
+			is_not_start = false;
+		}
+	}
+	deleteQueue(begin, end);
+}
+
 int maxNumber(int res, int rate)
 {
 	if (rate == 0)
@@ -161,113 +261,15 @@ int countDigits(double num, int i)
 
 int findMaxLength(int height, int res)
 {
+	if (height == 0)
+	{
+		return 2;
+	}
 	if (height * res / pow_2(1, height + 1) >= 6)
 	{
 		return height * res;
 	}
 	return findMaxLength(height, res * 2);
-}
-
-void viewTree2(Tree* root)
-{
-	int i = 0;
-	int j = 0;
-	int num_of_digits;
-	int num_of_elements_in_string = 2;
-	int height = heightTree(root);
-	int number_of_elements_max = maxNumber(1, height);
-	int max_length = findMaxLength(height, 1);
-	int length = max_length / 2;
-	int g;
-	int var = 0;
-	bool is_not_start_of_string = false, is_not_start = false;
-	Queue* begin = nullptr, * end = nullptr;
-	Tree* curr = nullptr;
-	pushQueue(begin, end, root);
-	while (j < number_of_elements_max)
-	{
-		curr = popQueue(begin, end);
-		if (curr)
-		{
-			num_of_digits = countDigits(curr->number, 0);
-			if (curr->number < 0) num_of_digits++;
-			if (is_not_start_of_string)
-			{
-				if (!is_not_start)
-				{
-					g = length * 2 - num_of_digits / 2;
-				}
-				else
-				{
-					g = length * 2 - var - num_of_digits / 2;
-					is_not_start = false;
-				}
-			}
-			else
-			{
-				is_not_start_of_string = true;
-				if (!is_not_start)
-				{
-					g = length - num_of_digits / 2;
-				}
-				else
-				{
-					g = length - var - num_of_digits / 2;
-					is_not_start = false;
-				}
-			}
-			for (int i = 0; i < g; i++)cout << " ";
-			var = (int)(num_of_digits / 2. - 0.1);
-			is_not_start = true;
-			cout << curr->number;
-			pushQueue(begin, end, curr->left);
-			pushQueue(begin, end, curr->right);
-		}
-		else
-		{
-			if (is_not_start_of_string)
-			{
-				if (!is_not_start)
-				{
-					g = length * 2 - 1;
-				}
-				else
-				{
-					g = length * 2 - var - 1;
-					is_not_start = false;
-				}
-			}
-			else
-			{
-				is_not_start_of_string = true;
-				if (!is_not_start)
-				{
-					g = length - 1;
-				}
-				else
-				{
-					g = length - var - 1;
-					is_not_start = false;
-				}
-			}
-			for (int i = 0; i < g; i++)cout << " ";
-			cout << "-";
-			pushQueue(begin, end, nullptr);
-			pushQueue(begin, end, nullptr);
-		}
-		j++;
-		i += 2;
-		if (i % num_of_elements_in_string == 0)
-		{
-			cout << endl;
-			num_of_elements_in_string *= 2;
-			length = max_length / num_of_elements_in_string;
-			i = 0;
-			is_not_start_of_string = false;
-			is_not_start = false;
-		}
-	}
-	deleteQueue(begin, end);
 }
 
 void pushQueue(Queue*& begin, Queue*& end, Tree* number)
@@ -336,20 +338,6 @@ int heightTree(Tree* temp)
 	else
 	{
 		return heightTree(temp->right) + 1;
-	}
-}
-
-
-bool isTreeExist(Tree* root)
-{
-	if (root)
-	{
-		return true;
-	}
-	else
-	{
-		cout << "Tree doesn't exist!" << endl;
-		return false;
 	}
 }
 
@@ -446,12 +434,12 @@ void makeBalance(Tree*& root, Arr* arr, int n, int number_of_elements)
 	}
 	else
 	{
-		int med = (n + number_of_elements) / 2;
+		int middle = (n + number_of_elements) / 2;
 		root = new Tree;
-		root->number = arr[med].number;
-		root->FIO = arr[med].FIO;
-		makeBalance(root->left, arr, n, med);
-		makeBalance(root->right, arr, med + 1, number_of_elements);
+		root->number = arr[middle].number;
+		root->FIO = arr[middle].FIO;
+		makeBalance(root->left, arr, n, middle);
+		makeBalance(root->right, arr, middle + 1, number_of_elements);
 	}
 }
 
