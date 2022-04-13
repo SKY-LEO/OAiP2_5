@@ -50,7 +50,8 @@ int heightTree(Tree* temp);
 int maxNumber(int res, int rate);
 int pow_2(int res, int i);
 int correctInputInt();
-int countR(double num, int i);
+int countDigits(double num, int i);
+int findMaxLength(int height, int res);
 
 int main()
 {
@@ -149,104 +150,107 @@ int pow_2(int res, int i)
 	return pow_2(res, i - 1);
 }
 
-int countR(double num, int i)
+int countDigits(double num, int i)
 {
 	if (num > -1 && num < 1)
 	{
 		return i;
 	}
-	return countR(num / 10, i + 1);
+	return countDigits(num / 10, i + 1);
+}
+
+int findMaxLength(int height, int res)
+{
+	if (height * res / pow_2(1, height + 1) >= 6)
+	{
+		return height * res;
+	}
+	return findMaxLength(height, res * 2);
 }
 
 void viewTree2(Tree* root)
 {
 	int i = 0;
 	int j = 0;
-	int res;
+	int num_of_digits;
 	int num_of_elements_in_string = 2;
 	int height = heightTree(root);
 	int number_of_elements_max = maxNumber(1, height);
-	int max_length = height * 32;//50
+	int max_length = findMaxLength(height, 1);
 	int length = max_length / 2;
 	int g;
 	int var = 0;
-	bool flag = false, flag1=false;
+	bool is_not_start_of_string = false, is_not_start = false;
 	Queue* begin = nullptr, * end = nullptr;
 	Tree* curr = nullptr;
 	pushQueue(begin, end, root);
 	while (j < number_of_elements_max)
 	{
-		
 		curr = popQueue(begin, end);
 		if (curr)
 		{
-			res = countR(curr->number, 0);
-			if (curr->number < 0) res++;
-			if (flag)
+			num_of_digits = countDigits(curr->number, 0);
+			if (curr->number < 0) num_of_digits++;
+			if (is_not_start_of_string)
 			{
-				if (!flag1)
+				if (!is_not_start)
 				{
-					g = length * 2 - res / 2;
+					g = length * 2 - num_of_digits / 2;
 				}
 				else
 				{
-					g = length * 2-var-res/2;
-					flag1 = false;
+					g = length * 2 - var - num_of_digits / 2;
+					is_not_start = false;
 				}
-				
-				for (int i = 0; i < g; i++)cout << " ";
-				var = (int)(res / 2. +0.4);
-				flag1 = true;
 			}
 			else
 			{
-				flag = true;
-				if (!flag1)
+				is_not_start_of_string = true;
+				if (!is_not_start)
 				{
-					g = length - res / 2;
+					g = length - num_of_digits / 2;
 				}
 				else
 				{
-					g = length - var - res/2;
-					flag1 = false;
+					g = length - var - num_of_digits / 2;
+					is_not_start = false;
 				}
-				for (int i = 0; i < g; i++)cout << " ";
-				var = (int)(res / 2. + 0.4);
-				flag1 = true;
 			}
+			for (int i = 0; i < g; i++)cout << " ";
+			var = (int)(num_of_digits / 2. - 0.1);
+			is_not_start = true;
 			cout << curr->number;
 			pushQueue(begin, end, curr->left);
 			pushQueue(begin, end, curr->right);
 		}
 		else
 		{
-			if (flag)
+			if (is_not_start_of_string)
 			{
-				if (!flag1)
+				if (!is_not_start)
 				{
-					g = length *2- 1;
+					g = length * 2 - 1;
 				}
 				else
 				{
-					g = length*2 - var-1;
-					flag1 = false;
+					g = length * 2 - var - 1;
+					is_not_start = false;
 				}
-				for (int i = 0; i < g; i++)cout << " ";
 			}
 			else
 			{
-				flag = true;
-				if (!flag1)
+				is_not_start_of_string = true;
+				if (!is_not_start)
 				{
-					g = length-1;
+					g = length - 1;
 				}
 				else
 				{
-					g = length - var-1;
-					flag1 = false;
+					g = length - var - 1;
+					is_not_start = false;
 				}
-				for (int i = 0; i < g; i++)cout << " ";
 			}
+			for (int i = 0; i < g; i++)cout << " ";
 			cout << "-";
 			pushQueue(begin, end, nullptr);
 			pushQueue(begin, end, nullptr);
@@ -259,7 +263,8 @@ void viewTree2(Tree* root)
 			num_of_elements_in_string *= 2;
 			length = max_length / num_of_elements_in_string;
 			i = 0;
-			flag = false;
+			is_not_start_of_string = false;
+			is_not_start = false;
 		}
 	}
 	deleteQueue(begin, end);
