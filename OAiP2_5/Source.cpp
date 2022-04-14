@@ -48,10 +48,12 @@ bool isAddLeaf(Tree*& root, int number, string FIO);
 bool isTreeExist(Tree* root);
 int heightTree(Tree* temp);
 int maxNumber(int res, int rate);
-int pow_2(int res, int i);
+int pow_2(int res, int rate);
 int correctInputInt();
 int countDigits(double num, int i);
-int findMaxLength(int height, int res);
+int findMaxLength(int height, int res, int max_length_of_number);
+int getNumberOfDigits(double number);
+int findMaxLengthOfNumber(Tree* temp);
 
 int main()
 {
@@ -149,7 +151,9 @@ void viewTree2(Tree* root)
 	bool is_not_start_of_string = false, is_not_start = false;
 	int height = heightTree(root);
 	int number_of_elements_max = maxNumber(1, height);
-	int max_length = findMaxLength(height, 1);
+	int max_length_of_number = findMaxLengthOfNumber(root);
+	if (max_length_of_number < 3)max_length_of_number = 3;
+	int max_length = findMaxLength(height, 1, round(max_length_of_number / 2.));
 	int length = max_length / 2;
 	Queue* begin = nullptr, * end = nullptr;
 	Tree* current_leaf = nullptr;
@@ -159,8 +163,7 @@ void viewTree2(Tree* root)
 		current_leaf = popQueue(begin, end);
 		if (current_leaf)
 		{
-			num_of_digits = countDigits(current_leaf->number, 0);
-			if (current_leaf->number < 0) num_of_digits++;
+			num_of_digits = getNumberOfDigits(current_leaf->number);
 			count_of_spaces = length * 2 - round(num_of_digits / 2.);
 			if (is_not_start_of_string)
 			{
@@ -240,14 +243,14 @@ int maxNumber(int res, int rate)
 	return maxNumber(res, rate - 1);
 }
 
-int pow_2(int res, int i)
+int pow_2(int res, int rate)
 {
-	if (i == 0)
+	if (rate == 0)
 	{
 		return res;
 	}
 	res *= 2;
-	return pow_2(res, i - 1);
+	return pow_2(res, rate - 1);
 }
 
 int countDigits(double num, int i)
@@ -259,17 +262,44 @@ int countDigits(double num, int i)
 	return countDigits(num / 10, i + 1);
 }
 
-int findMaxLength(int height, int res)
+int findMaxLength(int height, int res, int max_length_of_number)
 {
 	if (height == 0)
 	{
 		return 2;
 	}
-	if (height * res / pow_2(1, height + 1) >= 6)
+	if (height * res / pow_2(1, height + 1) >= max_length_of_number)
 	{
 		return height * res;
 	}
-	return findMaxLength(height, res * 2);
+	return findMaxLength(height, res * 2, max_length_of_number);
+}
+
+int getNumberOfDigits(double number)
+{
+	int length = 0;
+	length = countDigits(number, length);
+	if (number < 0.)length++;
+	return length;
+}
+
+int findMaxLengthOfNumber(Tree* temp)
+{
+	Tree* var = temp;
+	int length_left, length_right;
+	while (var->left != nullptr)
+	{
+		var = var->left;
+	}
+	length_left = getNumberOfDigits(var->number);
+	var = temp;
+	while (var->right != nullptr)
+	{
+		var = var->right;
+	}
+	length_right = getNumberOfDigits(var->number);
+	if (length_left >= length_right)return length_left;
+	else return length_right;
 }
 
 void pushQueue(Queue*& begin, Queue*& end, Tree* number)
