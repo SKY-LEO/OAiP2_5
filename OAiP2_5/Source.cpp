@@ -146,7 +146,7 @@ bool isTreeExist(Tree* root)
 
 void viewTree2(Tree* root)
 {
-	int count_of_pushed_elements = 0, count_of_printed_elements = 0, count_of_levels = 0, num_of_elements_in_string = 2;
+	int count_of_pushed_elements = 0, count_of_levels = 0, num_of_elements_in_string = 2;
 	int num_of_digits, count_of_spaces, offset_of_element;
 	bool is_not_start_of_string = false, is_not_start = false;
 	int height = heightTree(root);
@@ -158,7 +158,7 @@ void viewTree2(Tree* root)
 	Queue* begin = nullptr, * end = nullptr;
 	Tree* current_leaf = nullptr;
 	pushQueue(begin, end, root);
-	while (count_of_printed_elements < number_of_elements_max)
+	for (int i = 0; i < number_of_elements_max; i++)
 	{
 		current_leaf = popQueue(begin, end);
 		if (current_leaf)
@@ -218,7 +218,6 @@ void viewTree2(Tree* root)
 			pushQueue(begin, end, nullptr);
 			pushQueue(begin, end, nullptr);
 		}
-		count_of_printed_elements++;
 		count_of_pushed_elements += 2;
 		if (count_of_pushed_elements % num_of_elements_in_string == 0)
 		{
