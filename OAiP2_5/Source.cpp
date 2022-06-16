@@ -1,3 +1,7 @@
+/*
+* Определить количество символов во всех строках дерева
+*/
+
 #include <iostream>
 #include <conio.h>
 
@@ -320,7 +324,7 @@ void pushQueue(Queue*& begin, Queue*& end, Tree* number)
 	}
 }
 
-Tree* popQueue(Queue*& begin, Queue*& end)//по адресу
+Tree* popQueue(Queue*& begin, Queue*& end)
 {
 	Queue* temp = begin;
 	Tree* out;
